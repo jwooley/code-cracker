@@ -64,10 +64,11 @@ namespace CodeCracker.CSharp.Usage
             }
             else if (objectCreation.Parent.IsKind(SyntaxKind.Argument))
             {
-                var identifierName = GetIdentifierName(objectCreation, semanticModel);
+                var identifierName = GetIdentifierName(objectCreation);
 
-                var variableDeclaration = SyntaxFactory.VariableDeclaration(SyntaxFactory.IdentifierName(@"var"))
-                    .WithVariables(SyntaxFactory.SingletonSeparatedList(SyntaxFactory.VariableDeclarator(SyntaxFactory.Identifier(identifierName))
+                var whiteSpace = SyntaxFactory.Whitespace(" ");
+                var variableDeclaration = SyntaxFactory.VariableDeclaration(SyntaxFactory.IdentifierName(@"var").WithTrailingTrivia(whiteSpace))
+                    .WithVariables(SyntaxFactory.SingletonSeparatedList(SyntaxFactory.VariableDeclarator(SyntaxFactory.Identifier(identifierName).WithTrailingTrivia(whiteSpace))
                     .WithInitializer(SyntaxFactory.EqualsValueClause(SyntaxFactory.Token(SyntaxKind.EqualsToken), objectCreation))));
 
                 var arg = objectCreation.Parent as ArgumentSyntax;
@@ -100,33 +101,24 @@ namespace CodeCracker.CSharp.Usage
             return newRoot;
         }
 
-        private static string GetIdentifierName(ObjectCreationExpressionSyntax objectCreation, SemanticModel semanticModel)
+        private static string GetIdentifierName(ObjectCreationExpressionSyntax objectCreation)
         {
-            var identifierName = "disposableObject";
-
             var type = objectCreation.Type;
             if (type.IsKind(SyntaxKind.QualifiedName))
             {
                 var name = (QualifiedNameSyntax)type;
-                identifierName = LowerCaseFirstLetter(name.Right.Identifier.ValueText);
+                return LoverCaseFirstLetter(name.Right.Identifier.ValueText);
             }
             else if (type is SimpleNameSyntax)
             {
                 var name = (SimpleNameSyntax)type;
-                identifierName = LowerCaseFirstLetter(name.Identifier.ValueText);
+                return LoverCaseFirstLetter(name.Identifier.ValueText);
             }
-
-            var confilctingNames = from symbol in semanticModel.LookupSymbols(objectCreation.SpanStart)
-                                   let symbolIdentifierName = symbol?.ToDisplayParts().LastOrDefault(AnalyzerExtensions.IsName).ToString()
-                                   where symbolIdentifierName != null && symbolIdentifierName.StartsWith(identifierName)
-                                   select symbolIdentifierName;
-
-            var identifierPostFix = 0;
-            while (confilctingNames.Any(p => p == identifierName + ++identifierPostFix)) { }
-            return identifierName + (identifierPostFix == 0 ? "" : identifierPostFix.ToString());
+            return "disposableObject";
         }
 
-        private static string LowerCaseFirstLetter(string name) => char.ToLowerInvariant(name[0]) + name.Substring(1);
+        private static string LoverCaseFirstLetter(string name) => char.ToLowerInvariant(name[0]) + name.Substring(1);
+
 
         private static SyntaxNode CreateRootAddingDisposeToEndOfMethod(SyntaxNode root, ExpressionStatementSyntax statement, ILocalSymbol identitySymbol)
         {

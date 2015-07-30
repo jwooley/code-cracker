@@ -96,28 +96,6 @@ m.Dispose();".WrapInCSharpMethod();
         }
 
         [Fact]
-        public async Task PassedIntoBaseDoesNotCreateDiagnostic()
-        {
-            const string source = @"
-                class A
-                {
-                    public A(Disposable foo)
-                    { }
-                }
-                class B : A
-                {
-                    B() : base(new Disposable())
-                    { }
-                }
-                class Disposable : System.IDisposable
-                {
-                    void System.IDisposable.Dispose() { }
-                }
-";
-            await VerifyCSharpHasNoDiagnosticsAsync(source);
-        }
-
-        [Fact]
         public async Task PassedToConstructorDoesNotCreateDiagnostic()
         {
             const string source = @"
@@ -125,9 +103,9 @@ m.Dispose();".WrapInCSharpMethod();
                 {
                     public A(Disposable foo)
                     { }
-
+                    
                     void Foo()
-                    {
+                    { 
                         var a = new A(new Disposable());
                     }
                 }
@@ -504,7 +482,7 @@ using (m = new System.IO.MemoryStream())
                 class A
                 {
                     void Foo()
-                    {
+                    {    
                         using (var disposable = new Disposable<int>())
                         {
                             string.Format(string.Empty, disposable);
@@ -512,127 +490,6 @@ using (m = new System.IO.MemoryStream())
                     }
                 }
                 class Disposable<T> : System.IDisposable
-                {
-                    void IDisposable.Dispose() { }
-                    public void Flush() { }
-                }
-";
-            await VerifyCSharpFixAsync(source, fixtest);
-        }
-
-        [Fact]
-        public async Task FixAssignmentInsideArgumentWithGenericName2()
-        {
-            const string source = @"
-                class A
-                {
-                    void Foo()
-                    {
-                        string.Format(string.Empty,new Disposable());
-                    }
-                }
-                class Disposable : System.IDisposable
-                {
-                    void IDisposable.Dispose() { }
-                    public void Flush() { }
-                }
-";
-            const string fixtest = @"
-                class A
-                {
-                    void Foo()
-                    {
-                        using (var disposable = new Disposable())
-                        {
-                            string.Format(string.Empty, disposable);
-                        }
-                    }
-                }
-                class Disposable : System.IDisposable
-                {
-                    void IDisposable.Dispose() { }
-                    public void Flush() { }
-                }
-";
-            await VerifyCSharpFixAsync(source, fixtest);
-        }
-
-        [Fact]
-        public async Task FixAssignmentWithConflictingsLocalName()
-        {
-            const string source = @"
-                class A
-                {
-                    void Foo()
-                    {
-                        var str = "";
-                        string.Format(str, new Str());
-                    }
-                }
-                class Str : System.IDisposable
-                {
-                    void IDisposable.Dispose() { }
-                    public void Flush() { }
-                }
-";
-            const string fixtest = @"
-                class A
-                {
-                    void Foo()
-                    {
-                        var str = "";
-                        using (var str1 = new Str())
-                        {
-                            string.Format(str, str1);
-                        }
-                    }
-                }
-                class Str : System.IDisposable
-                {
-                    void IDisposable.Dispose() { }
-                    public void Flush() { }
-                }
-";
-            await VerifyCSharpFixAsync(source, fixtest);
-        }
-
-        [Fact]
-        public async Task FixAssignmentWithManyConflictingsName()
-        {
-            const string source = @"
-                class A
-                {
-                    class str { }
-                    string str1 { get; set; }
-                    string str2;
-                    void Foo()
-                    {
-                        var str3 = "";
-                        string.Format(str3, new Str());
-                    }
-                }
-                class Str : System.IDisposable
-                {
-                    void IDisposable.Dispose() { }
-                    public void Flush() { }
-                }
-";
-            const string fixtest = @"
-                class A
-                {
-                    class str { }
-                    string str1 { get; set; }
-                    string str2;
-                    void Foo()
-                    {
-                        var str3 = "";
-                        using (var str4 = new Str())
-                        {
-                            string.Format(str3, str4);
-                        }
-                    }
-                }
-                class Str : System.IDisposable
                 {
                     void IDisposable.Dispose() { }
                     public void Flush() { }
@@ -1087,7 +944,7 @@ m.Dispose();".WrapInCSharpMethod();
              @"namespace MyNamespace
                   {
                         public class DisposableClass : System.IDisposable  { }
-
+                      
                         public class ActualClass
                         {
                             public DisposableClass Method()
@@ -1100,26 +957,5 @@ m.Dispose();".WrapInCSharpMethod();
             await VerifyCSharpHasNoDiagnosticsAsync(source);
         }
 
-        [Fact]
-        public async Task WhenVariableIsReturnedAsAnImplementedInterface()
-        {
-            const string source =
-            @"namespace MyNamespace
-            {
-                public class DisposableClass : System.IDisposable { }
-
-                public class ActualClass
-                {
-                    public System.IDisposable Method()
-                    {
-                        var disposable = new DisposableClass();
-                        return disposable;
-                    }
-                }
-            }";
-
-            await VerifyCSharpHasNoDiagnosticsAsync(source);
-        }
     }
 }
-

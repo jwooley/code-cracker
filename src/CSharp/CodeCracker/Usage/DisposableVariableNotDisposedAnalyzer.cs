@@ -38,10 +38,8 @@ namespace CodeCracker.CSharp.Usage
             if (objectCreation == null) return;
             if (objectCreation?.Parent is UsingStatementSyntax) return;
             if (objectCreation?.Parent is ReturnStatementSyntax) return;
-            if (objectCreation.Ancestors().Any(i => i.IsAnyKind(
-                SyntaxKind.ThisConstructorInitializer,
-                SyntaxKind.BaseConstructorInitializer,
-                SyntaxKind.ObjectCreationExpression))) return;
+            if (objectCreation.FirstAncestorOfType<ConstructorInitializerSyntax>()?.Kind() == SyntaxKind.ThisConstructorInitializer) return;
+            if (objectCreation.FirstAncestorOfType<ObjectCreationExpressionSyntax>() != null) return;
 
             var semanticModel = context.SemanticModel;
             var type = semanticModel.GetSymbolInfo(objectCreation.Type).Symbol as INamedTypeSymbol;
@@ -104,7 +102,7 @@ namespace CodeCracker.CSharp.Usage
         {
             var returnTypeSymbol = semanticModel.GetTypeInfo(method.ReturnType).Type;
             if (returnTypeSymbol == null) return false;
-            if (returnTypeSymbol.SpecialType == SpecialType.System_Void) return false;
+            if (returnTypeSymbol.SpecialType == SpecialType.System_Void || !returnTypeSymbol.Equals(identitySymbol.Type)) return false;
             var returns = method.Body.DescendantNodes().OfType<ReturnStatementSyntax>();
             var isReturning = returns.Any(r =>
             {
