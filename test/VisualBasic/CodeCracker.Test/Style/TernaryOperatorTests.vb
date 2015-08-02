@@ -178,49 +178,6 @@ Namespace ConsoleApplication1
 End Namespace"
         Await VerifyBasicFixAllAsync(New String() {sourceAssign, sourceAssign.Replace("MyType", "MyType1")}, New String() {fix, fix.Replace("MyType", "MyType1")})
     End Function
-
-    <Fact>
-    Public Async Function WhenTernaryWithObjectDoesApplyFix() As Task
-        Const source = "
-Class MyCustomer
-    Public Property Value As String
-End Class
-Public Class ExcelLineRecordClass
-    Public Property LineNumber As Integer
-    Public Property imported As Boolean
-End Class
-Class Tester
-    Private Sub Test()
-        Dim ExcelRecord As New ExcelLineRecordClass
-        Dim lCell As New MyCustomer
-        If lCell Is Nothing Then
-            ExcelRecord.imported = False
-        Else
-            ExcelRecord.imported = If(lCell.Value, lCell.Value.ToString = ""X"")
-        End If
-    End Sub
-End Class"
-
-        Const fix = "
-Class MyCustomer
-    Public Property Value As String
-End Class
-Public Class ExcelLineRecordClass
-    Public Property LineNumber As Integer
-    Public Property imported As Boolean
-End Class
-Class Tester
-    Private Sub Test()
-        Dim ExcelRecord As New ExcelLineRecordClass
-        Dim lCell As New MyCustomer
-        ExcelRecord.imported = If(lCell Is Nothing, False, If(lCell.Value, lCell.Value.ToString = ""X""))
-    End Sub
-End Class"
-
-        Await VerifyBasicFixAsync(source, fix)
-
-    End Function
-
 End Class
 
 Public Class TernaryOperatorWithReturnTests
@@ -389,7 +346,6 @@ End Namespace"
 
         Await VerifyBasicFixAllAsync(New String() {sourceReturn, sourceReturn.Replace("MyType", "MyType1")}, New String() {fix, fix.Replace("MyType", "MyType1")})
     End Function
-
 End Class
 
 Public Class TernaryOperatorFromIifTests
@@ -523,7 +479,4 @@ End Class"
         Await VerifyBasicHasNoDiagnosticsAsync(source)
     End Function
 
-
-
 End Class
-

@@ -225,45 +225,6 @@ namespace CodeCracker.Test.CSharp.Style
         }
 
         [Fact]
-        public async Task WhenUsingIfAndElseWithNullableValueTypeAssignmentChangeToTernaryFix()
-        {
-            const string source = @"
-    namespace ConsoleApplication1
-    {
-        class TypeName
-        {
-            public void Foo()
-            {
-                var something = true;
-                int? a;
-                if (something)
-                {
-                    a = 1;
-                }
-                else
-                {
-                    a = null;
-                }
-            }
-        }
-    }";
-            const string fixtest = @"
-    namespace ConsoleApplication1
-    {
-        class TypeName
-        {
-            public void Foo()
-            {
-                var something = true;
-                int? a;
-                a = something ? 1 : (int?)null;
-            }
-        }
-    }";
-            await VerifyCSharpFixAsync(source, fixtest, 0);
-        }
-
-        [Fact]
         public async Task WhenUsingIfAndElseWithAssignmentChangeToTernaryFixAll()
         {
             const string source = @"
@@ -283,14 +244,6 @@ namespace CodeCracker.Test.CSharp.Style
                 {
                     a = ""b"";
                 }
-                if (something)
-                {
-                    a = ""a"";
-                }
-                else
-                {
-                    a = ""b"";
-                }
             }
         }
     }";
@@ -303,7 +256,6 @@ namespace CodeCracker.Test.CSharp.Style
             {
                 var something = true;
                 string a;
-                a = something ? ""a"" : ""b"";
                 a = something ? ""a"" : ""b"";
             }
         }
@@ -371,14 +323,6 @@ namespace CodeCracker.Test.CSharp.Style
                 {
                     a = ""c"" + GetInfo(1);
                 }
-                if (something)
-                {
-                    a = ""a"" + ""b"";
-                }
-                else
-                {
-                    a = ""c"" + GetInfo(1);
-                }
             }
         }
     }";
@@ -391,7 +335,6 @@ namespace CodeCracker.Test.CSharp.Style
             {
                 var something = true;
                 string a;
-                a = something ? ""a"" + ""b"" : ""c"" + GetInfo(1);
                 a = something ? ""a"" + ""b"" : ""c"" + GetInfo(1);
             }
         }
@@ -437,40 +380,6 @@ namespace CodeCracker.Test.CSharp.Style
         }
 
         [Fact]
-        public async Task WhenUsingIfAndElseWithNullableValueTypeDirectReturnChangeToTernaryFix()
-        {
-            const string source = @"
-    namespace ConsoleApplication1
-    {
-        class TypeName
-        {
-            public int? Foo()
-            {
-                var something = true;
-                if (something)
-                    return 1;
-                else
-                    return null;
-            }
-        }
-    }";
-
-            const string fixtest = @"
-    namespace ConsoleApplication1
-    {
-        class TypeName
-        {
-            public int? Foo()
-            {
-                var something = true;
-                return something ? 1 : (int?)null;
-            }
-        }
-    }";
-            await VerifyCSharpFixAsync(source, fixtest, 0);
-        }
-
-        [Fact]
         public async Task WhenUsingIfAndElseWithDirectReturnChangeToTernaryFixAll()
         {
             const string source = @"
@@ -485,10 +394,6 @@ namespace CodeCracker.Test.CSharp.Style
                     return 1;
                 else
                     return 2;
-                if (something)
-                    return 1;
-                else
-                    return 2;
             }
         }
     }";
@@ -501,7 +406,6 @@ namespace CodeCracker.Test.CSharp.Style
             public int Foo()
             {
                 var something = true;
-                return something ? 1 : 2;
                 return something ? 1 : 2;
             }
         }
