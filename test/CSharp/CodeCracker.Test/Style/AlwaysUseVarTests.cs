@@ -166,7 +166,6 @@ namespace CodeCracker.Test.CSharp.Style
             public void Foo()
             {
                 int a = 10;
-                int b = 10;
             }
         }
     }";
@@ -180,7 +179,6 @@ namespace CodeCracker.Test.CSharp.Style
             public void Foo()
             {
                 string a = ""10"";
-                string b = ""10"";
             }
         }
     }";
@@ -195,7 +193,6 @@ namespace CodeCracker.Test.CSharp.Style
             public void Foo()
             {
                 var a = 10;
-                var b = 10;
             }
         }
     }";
@@ -209,7 +206,6 @@ namespace CodeCracker.Test.CSharp.Style
             public void Foo()
             {
                 var a = ""10"";
-                var b = ""10"";
             }
         }
     }";
