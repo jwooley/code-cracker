@@ -38,7 +38,7 @@ End Namespace"
         Public Async Function WhileWithoutStringConcatWithMethoParameterDoesNotCreateDiagnostic() As Task
             Dim source = "
     Public Class TypeName
-        Public Sub Looper(ByRef a As Integer)
+        Public Sub Looper(ByRef a As Integer = 0)
             While a < 10
                 a += 1
             End While
