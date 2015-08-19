@@ -606,26 +606,11 @@ namespace CodeCracker.Test.CSharp.Performance
         }
 
         [Fact]
-        public async Task WhileWithoutStringConcatWithMethodParameterDoesNotCreateDiagnostic()
+        public async Task WhileWithoutStringConcatWithMethoParameterDoesNotCreateDiagnostic()
         {
             var source = @"
 public void Looper(int a = 0)
 {
-    while (a < 10)
-    {
-        a += 1;
-    }
-}".WrapInCSharpClass();
-            await VerifyCSharpHasNoDiagnosticsAsync(source);
-        }
-
-        [Fact]
-        public async Task WhileWithoutStringConcatWithMethodRefParameterDoesNotCreateDiagnostic()
-        {
-            var source = @"
-public void Looper(ref int a)
-{
-    a = 0;
     while (a < 10)
     {
         a += 1;
