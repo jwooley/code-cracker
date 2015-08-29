@@ -10,9 +10,8 @@ namespace CodeCracker
     {
         public static bool IsGenerated(this SyntaxNodeAnalysisContext context) => (context.SemanticModel?.SyntaxTree?.IsGenerated() ?? false) || (context.Node?.IsGenerated() ?? false);
 
-        private static readonly string[] generatedCodeAttributes = new string[] { "DebuggerNonUserCode", "GeneratedCode", "DebuggerNonUserCodeAttribute", "GeneratedCodeAttribute" };
-
-        public static bool IsGenerated(this SyntaxNode node) => node.HasAttributeOnAncestorOrSelf(generatedCodeAttributes);
+        private static readonly string[] _generatedCodeAttributes = new string[] { "DebuggerNonUserCode", "GeneratedCode", "DebuggerNonUserCodeAttribute", "GeneratedCodeAttribute" };
+        public static bool IsGenerated(this SyntaxNode node) => node.HasAttributeOnAncestorOrSelf(_generatedCodeAttributes);
 
         public static bool IsGenerated(this SyntaxTreeAnalysisContext context) => context.Tree?.IsGenerated() ?? false;
 
