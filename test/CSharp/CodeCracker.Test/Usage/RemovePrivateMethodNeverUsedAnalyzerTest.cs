@@ -359,5 +359,24 @@ public class Foo : System.IEquatable<Foo>
 }";
             await VerifyCSharpHasNoDiagnosticsAsync(source);
         }
+
+        [Fact]
+        public async void ImplicitlyImplementedInterfaceMethodDoesNotCreateDiagnostic()
+        {
+            const string source = @"
+public interface IDoIt
+{
+    void DoItNow();
+}
+
+public class Foo : IDoIt
+{
+    public void DoItNow()
+    {
+        throw new System.NotImplementedException();
+    }
+}";
+            await VerifyCSharpHasNoDiagnosticsAsync(source);
+        }
     }
 }
